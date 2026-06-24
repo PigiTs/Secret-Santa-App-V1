@@ -1,121 +1,95 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useState, useEffect } from 'react'
+import bgHero from './assets/hero-bg.jpg'
+
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [fullname, setFullname] = useState('')
+  const [email, setEmail] = useState('')
+  const [secretSantas, setSecretSantas] = useState([])
+
+  useEffect(() => {
+    fetchSecretSantas()
+  }, [])
+
+  const fetchSecretSantas = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/list/')
+      const data = await response.json()
+      console.log(data)
+      setSecretSantas(data.data)
+
+    } catch (error) {
+      console.error('Error fetching secret santas:', error)
+    }
+  };
+
+  const addSecretSanta = async () => {
+    const newSanta = {
+      fullname: fullname,
+      email: email
+    }
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/list/create/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newSanta)
+      })
+
+      const data = await response.json()
+      console.log(data)
+      setSecretSantas([...secretSantas, data.data])
+      setFullname('')
+      setEmail('')
+
+    } catch (error) {
+      console.error('Error adding secret santa:', error)
+
+    }
+  }
+
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+      <section>
+        <h1>
+          Making a List
+        </h1>
+
+        <input
+          type="text"
+          placeholder="Enter full name"
+          value={fullname}
+          onChange={(e) => setFullname(e.target.value)}
+        />
+
+        <input
+          type="email"
+          placeholder="Enter email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <button onClick={addSecretSanta}>Add</button>
+      </section><section>
+        <h1>Checking it Twice</h1>
+        <ul>
+          {secretSantas.map((santa) => (
+            <li key={santa.id}>
+              <strong>{santa.fullname}</strong> - {santa.email}
+              <button>Edit</button>
+              <button>Delete</button>
+            </li>
+          ))}
+        </ul>
       </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
+      <section>
+        <h1>Find out Who is Naughty or Nice</h1>
+        <button>Draw Names</button>
       </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
     </>
+
   )
 }
 
