@@ -1,10 +1,14 @@
 from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework import status
 
 from .models import NaughtyOrNiceList, DrawResult
 from .serializer import NaughtyOrNiceListSerializer
 import random
+
+from django.core.mail import send_mail
+from django.http import HttpResponse
 
 # Create your views here.
 @api_view(['GET'])
@@ -67,6 +71,18 @@ def draw(request):
 
         return Response({'message': 'Secret Santa draw completed successfully.','data': draw_results}, status=status.HTTP_200_OK)
 
-             
+@csrf_exempt
+def send_email(request):
+    recipients = DrawResult.objects.select_related('santa', 'santee').all()
 
-   
+    for recipient in recipients:
+        send_mail(
+            subject="Secret Santa is coming to town!",
+            message=
+            "You have been chosen as a Secret Santa for " + recipient.santee.fullname + "!!\n\nSpread the holiday spirit.",
+            from_email="noreply@example.com",
+            recipient_list=[recipient.santa.email],
+            fail_silently=False,
+        )
+
+    return HttpResponse("Email sent!")

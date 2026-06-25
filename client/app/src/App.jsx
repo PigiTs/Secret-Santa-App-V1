@@ -102,14 +102,27 @@ function App() {
 
   const drawNames = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/draw/', {
+      const drawResponse = await fetch('http://127.0.0.1:8000/api/draw/', {
         method: 'POST',
       })
 
-      const data = await response.json()
+      if (!drawResponse.ok) {
+      throw new Error("Draw failed");
+      }
+
+      const data = await drawResponse.json()
       console.log(data.data)
       setDrawResult(data.data)
-      console.log("RENDER STATE:", drawResult);
+      const emailResponse = await fetch('http://127.0.0.1:8000/api/send-email/', {
+        method: 'POST',
+      })
+      if (!emailResponse.ok) {
+      throw new Error("Email sending failed");
+      }
+      
+      const emailData = await emailResponse.json();
+   
+      
     } catch (error) {
       console.error('Error drawing names:', error)
     }

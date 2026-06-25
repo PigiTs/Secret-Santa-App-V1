@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import get_naughty_or_nice_list,create_list_entry,update_list_entry,delete_list_entry, draw
+from .views import get_naughty_or_nice_list,create_list_entry, send_email,update_list_entry,delete_list_entry, draw
 
 urlpatterns = [
     path('list/', get_naughty_or_nice_list, name='list'),
@@ -7,4 +7,5 @@ urlpatterns = [
     path('list/edit/<int:pk>/', update_list_entry, name='update_list_entry'),
     path('list/delete/<int:pk>/', delete_list_entry, name='delete_list_entry'),
     path('draw/', draw, name='draw'),
+    path('send-email/', send_email, name='send_email'),
 ]
