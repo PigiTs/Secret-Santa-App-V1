@@ -9,6 +9,7 @@ function App() {
   const [secretSantas, setSecretSantas] = useState([])
   const [editingId, setEditingId] = useState(null)
   const [editSanta, setEditSanta] = useState({ fullname: '', email: '' })
+  const [drawResult, setDrawResult] = useState([])
 
   useEffect(() => {
     fetchSecretSantas()
@@ -99,6 +100,21 @@ function App() {
     }
   }
 
+  const drawNames = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/draw/', {
+        method: 'POST',
+      })
+
+      const data = await response.json()
+      console.log(data.data)
+      setDrawResult(data.data)
+      console.log("RENDER STATE:", drawResult);
+    } catch (error) {
+      console.error('Error drawing names:', error)
+    }
+  }
+
 
   return (
     <>
@@ -165,7 +181,7 @@ function App() {
       </section>
       <section>
         <h1>Find out Who is Naughty or Nice</h1>
-        <button>Draw Names</button>
+        <button onClick={drawNames}>Draw Names</button>
       </section>
     </>
 

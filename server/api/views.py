@@ -2,8 +2,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import NaughtyOrNiceList
+from .models import NaughtyOrNiceList, DrawResult
 from .serializer import NaughtyOrNiceListSerializer
+import random
 
 # Create your views here.
 @api_view(['GET'])
@@ -40,3 +41,32 @@ def delete_list_entry(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
     except NaughtyOrNiceList.DoesNotExist:
         return Response({'error': 'Entry not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['POST'])
+def draw(request):
+    if request.method == 'POST':
+        participants = list(NaughtyOrNiceList.objects.all())
+        if len(participants) < 2:
+            return Response({'error': 'Not enough participants to draw.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        random.shuffle(participants)
+        DrawResult.objects.all().delete()
+        draw_results = []
+    
+        for i in range(len(participants)):
+            santa = participants[i]
+            santee = participants[(i + 1) % len(participants)]
+            DrawResult.objects.create(
+            santa=santa,
+            santee=santee
+            )
+            draw_results.append({
+            "santa": santa.fullname,
+            "santee": santee.fullname
+            })
+
+        return Response({'message': 'Secret Santa draw completed successfully.','data': draw_results}, status=status.HTTP_200_OK)
+
+             
+
+   
