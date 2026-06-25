@@ -7,3 +7,19 @@ class NaughtyOrNiceList(models.Model):
 
     def __str__(self):
         return self.fullname
+
+class DrawResult(models.Model):
+    santa = models.ForeignKey(
+        NaughtyOrNiceList,
+        on_delete=models.CASCADE,
+        related_name='santa_assignments'
+    )
+
+    santee = models.ForeignKey(
+        NaughtyOrNiceList,
+        on_delete=models.CASCADE,
+        related_name='santee_assignments'
+    )
+
+    def __str__(self):
+        return f"{self.santa.fullname} → {self.santee.fullname}"

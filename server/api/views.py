@@ -19,3 +19,24 @@ def create_list_entry(request):
         serializer.save()
         return Response({'data': serializer.data}, status=status.HTTP_201_CREATED)
     return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+def update_list_entry(request, pk):
+    try:
+        entry = NaughtyOrNiceList.objects.get(pk=pk)
+        serializer = NaughtyOrNiceListSerializer(entry, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'data': serializer.data})
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except NaughtyOrNiceList.DoesNotExist:
+        return Response({'error': 'Entry not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['DELETE'])
+def delete_list_entry(request, pk):
+    try:
+        entry = NaughtyOrNiceList.objects.get(pk=pk)
+        entry.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except NaughtyOrNiceList.DoesNotExist:
+        return Response({'error': 'Entry not found'}, status=status.HTTP_404_NOT_FOUND)

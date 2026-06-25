@@ -7,6 +7,8 @@ function App() {
   const [fullname, setFullname] = useState('')
   const [email, setEmail] = useState('')
   const [secretSantas, setSecretSantas] = useState([])
+  const [editingId, setEditingId] = useState(null)
+  const [editSanta, setEditSanta] = useState({ fullname: '', email: '' })
 
   useEffect(() => {
     fetchSecretSantas()
@@ -50,6 +52,53 @@ function App() {
     }
   }
 
+  const editSecretSanta = (santa) => {
+    setEditingId(santa.id)
+    setEditSanta({
+      fullname: santa.fullname,
+      email: santa.email
+    })
+  }
+
+
+  const updateSecretSanta = async (id) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/list/edit/${id}/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(editSanta)
+      })
+
+      const data = await response.json()
+
+      setSecretSantas(secretSantas.map((santa) => (santa.id === id ? data.data : santa)))
+      setEditingId(null)
+      setEditSanta({ fullname: "", email: "" })
+
+    } catch (error) {
+      console.error('Error editing secret santa:', error)
+
+    }
+  }
+
+  const deleteSecretSanta = async (id) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/list/delete/${id}/`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        setSecretSantas(secretSantas.filter((santa) => santa.id !== id))
+      } else {
+        console.error('Error deleting secret santa:', response.statusText)
+      }
+    } catch (error) {
+      console.error('Error deleting secret santa:', error)
+    }
+  }
+
 
   return (
     <>
@@ -77,9 +126,39 @@ function App() {
         <ul>
           {secretSantas.map((santa) => (
             <li key={santa.id}>
-              <strong>{santa.fullname}</strong> - {santa.email}
-              <button>Edit</button>
-              <button>Delete</button>
+              {editingId === santa.id ? (
+                <>
+                  <input
+                    name="fullname"
+                    value={editSanta.fullname}
+                    onChange={(e) =>
+                      setEditSanta({
+                        ...editSanta,
+                        [e.target.name]: e.target.value
+                      })
+                    }
+                  />
+                  <input
+                    name="email"
+                    value={editSanta.email}
+                    onChange={(e) =>
+                      setEditSanta({
+                        ...editSanta,
+                        [e.target.name]: e.target.value
+                      })
+                    }
+                  />
+                  <button onClick={() => updateSecretSanta(santa.id)}>Save</button>
+                  <button onClick={() => setEditingId(null)}>Cancel</button>
+                </>
+
+              ) : (
+                <>
+                  <strong>{santa.fullname}</strong> - {santa.email}
+                  <button onClick={() => editSecretSanta(santa)}>Edit</button>
+                  <button onClick={() => deleteSecretSanta(santa.id)}>Delete</button>
+                </>
+              )}
             </li>
           ))}
         </ul>
@@ -92,5 +171,6 @@ function App() {
 
   )
 }
+
 
 export default App
