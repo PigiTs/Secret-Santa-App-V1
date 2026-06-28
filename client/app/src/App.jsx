@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import bgHero from './assets/hero-bg.jpg'
 
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css'
 
 function App() {
@@ -131,8 +132,9 @@ function App() {
 
   return (
     <>
+    <div className="app">
       <section>
-        <h1>
+        <h1 className="mb-4">
           Making a List
         </h1>
 
@@ -149,12 +151,13 @@ function App() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <button onClick={addSecretSanta}>Add</button>
-      </section><section>
-        <h1>Checking it Twice</h1>
-        <ul>
+        <button className="btn btn-success" onClick={addSecretSanta}>Add</button>
+      </section>
+      <section>
+        <h1 className="mb-4">Checking it Twice</h1>
+        <ul className="list-group">
           {secretSantas.map((santa) => (
-            <li key={santa.id}>
+            <li key={santa.id} className="list-group-item d-flex justify-content-between align-items-center">
               {editingId === santa.id ? (
                 <>
                   <input
@@ -177,25 +180,31 @@ function App() {
                       })
                     }
                   />
-                  <button onClick={() => updateSecretSanta(santa.id)}>Save</button>
-                  <button onClick={() => setEditingId(null)}>Cancel</button>
+                  <button className="btn btn-success"  onClick={() => updateSecretSanta(santa.id)}>Save</button>
+                  <button className="btn btn-danger" onClick={() => setEditingId(null)}>Cancel</button>
                 </>
 
               ) : (
                 <>
                   <strong>{santa.fullname}</strong> - {santa.email}
-                  <button onClick={() => editSecretSanta(santa)}>Edit</button>
-                  <button onClick={() => deleteSecretSanta(santa.id)}>Delete</button>
+                  <div className="d-flex gap-2">
+                  <button className="btn btn-success" onClick={() => editSecretSanta(santa)}>Edit</button>
+                  <button className="btn btn-danger" onClick={() => deleteSecretSanta(santa.id)}>Delete</button>
+                  </div>
                 </>
               )}
             </li>
           ))}
         </ul>
+     
       </section>
       <section>
-        <h1>Find out Who is Naughty or Nice</h1>
-        <button onClick={drawNames}>Draw Names</button>
+        <h1 className="mb-4">Find out Who is Naughty or Nice</h1>
+        <div className="d-flex justify-content-center">
+        <button className="btn btn-danger btn-lg" onClick={drawNames}>Draw Names</button>
+        </div>
       </section>
+      </div>
     </>
 
   )
